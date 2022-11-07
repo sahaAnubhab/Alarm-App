@@ -10,46 +10,30 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     lateinit var alarmService: AlarmService
+    lateinit var calendar: Calendar
+    var t = 5
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         alarmService = AlarmService(this)
 
+        calendar = Calendar.getInstance()
+
         setExact.setOnClickListener {
             setAlarm { alarmService.setExactAlarm(it) }
+            t += 5
         }
 
-        setRepetitive.setOnClickListener { setAlarm { alarmService.setRepetitiveAlarm(it) } }
     }
 
     private fun setAlarm(callback: (Long) -> Unit) {
         Calendar.getInstance().apply {
-            this.set(Calendar.SECOND, 0)
+            this.set(Calendar.SECOND, Calendar.SECOND)
             this.set(Calendar.MILLISECOND, 0)
-            DatePickerDialog(
-                this@MainActivity,
-                0,
-                { _, year, month, day ->
-                    this.set(Calendar.YEAR, year)
-                    this.set(Calendar.MONTH, month)
-                    this.set(Calendar.DAY_OF_MONTH, day)
-                    TimePickerDialog(
-                        this@MainActivity,
-                        0,
-                        { _, hour, minute ->
-                            this.set(Calendar.HOUR_OF_DAY, hour)
-                            this.set(Calendar.MINUTE, minute)
-                            callback(this.timeInMillis)
-                        },
-                        this.get(Calendar.HOUR_OF_DAY),
-                        this.get(Calendar.MINUTE),
-                        false
-                    ).show()
-                },
-                this.get(Calendar.YEAR),
-                this.get(Calendar.MONTH),
-                this.get(Calendar.DAY_OF_MONTH)
-            ).show()
+            this.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE))
+            this.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY))
+            callback(this.timeInMillis + t*1000*60)
         }
+
     }
 }
